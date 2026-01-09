@@ -44,13 +44,12 @@ RUN npm ci --omit=dev
 # Копируем скомпилированный код
 COPY --from=builder /app/dist ./dist
 
-# Копируем scripts
-COPY scripts /scripts
-RUN chmod +x /scripts/wait-for-db.sh
-
 # Меняем пользователя
 USER app
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "/scripts/wait-for-db.sh && node dist/app.js"]
+HEALTHCHECK --interval=10s --timeout=3s --retries=5 \
+  CMD wget -qO- http://localhost:3000/health/db || exit 1
+
+CMD ["node", "dist/app.js"]

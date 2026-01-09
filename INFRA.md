@@ -46,8 +46,6 @@ mysql_data ✅
 
 ✔ Restart policy (unless-stopped)
 
-1.3 Wait-for-DB (🔥 важный момент)
-
 ✔ Docker healthcheck у MySQL
 ✔ depends_on: condition: service_healthy
 ✔ Реальная проверка SELECT 1
@@ -57,10 +55,9 @@ mysql_data ✅
 1.4 Healthcheck
 ✔ /health endpoint есть
 ✔ Docker healthcheck у MySQL есть
-❌ /health/db — пока нет
-❌ Docker HEALTHCHECK для API — пока нет
-❌ убрать wait-for-db полностью
-❌ добавить /health/db
+✔ /health/db есть
+✔ Docker HEALTHCHECK для API — пока нет
+✔ убрать wait-for-db полностью
 ❌ перейти к Prisma / TypeORM
 
 1.5 Graceful shutdown
@@ -242,7 +239,7 @@ Thumbs.db
 Поднимем пустой Express + /health
 
 👉 Шаг 3:
-Подключим MySQL + wait-for-db
+Подключим MySQL
 
 👉 Шаг 4:
 Auth
