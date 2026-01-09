@@ -24,12 +24,16 @@ services:
     ports:
       - "3306:3306"
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test:
+        [
+          "CMD-SHELL",
+          "mysql -h localhost -uapp -papp --ssl-mode=DISABLED -e \"SELECT 1\" > /dev/null || exit 1"
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
     restart: unless-stopped
 
 volumes:
   mysql_data:
-

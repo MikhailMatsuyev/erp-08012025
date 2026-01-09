@@ -32,3 +32,7 @@ o /logout [GET] - выйти из системы;
 • Старые токены должны перестать работать после выхода;
 • Вход в API может осуществлять несколько устройств под одним логином.  
 • После выхода одного из устройств, остальные устройства одного пользователя должны продолжать работать.
+
+
+- MySQL TLS is disabled for internal Docker health checks due to self-signed certificates.
+  TLS disabled for internal Docker network health checks.

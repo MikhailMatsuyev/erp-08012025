@@ -19,58 +19,51 @@ docker compose up
 🐳 EPIC 1 — Docker & окружение
 1.1 Dockerfile (Node.js)
 
-Multi-stage build (опционально)
-
-Non-root user
-
-Production ready
-
-EXPOSE 3000
+✔ Multi-stage build
+✔ node:20-alpine
+✔ Non-root user (app)
+✔ Production dependencies (npm ci --omit=dev)
+✔ TS build (dist/)
+✔ EXPOSE 3000
+✔ NODE_ENV=production
 
 1.2 docker-compose.yml
 
-Сервисы:
+✔ Сервисы:
 
-api — Express
+ api — Express + TS
 
-db — MySQL 8
+ mysql — MySQL 8
 
-Volumes:
+✔ Volumes:
 
-mysql_data
+mysql_data ✅
+(uploads пока логически заложен, но физически ещё не используем — это нормально)
 
-uploads
+✔ .env подключается через env_file
 
-Environment:
+✔ depends_on: condition: service_healthy — ВАЖНО
 
-берётся из .env
+✔ Restart policy (unless-stopped)
 
 1.3 Wait-for-DB (🔥 важный момент)
 
-API не стартует, пока MySQL не готов
-
-Использовать:
-
-wait-for-it.sh или
-
-mysqladmin ping в entrypoint
-
-📌 Это очень хорошо смотрится для работодателей
+✔ Docker healthcheck у MySQL
+✔ depends_on: condition: service_healthy
+✔ Реальная проверка SELECT 1
+✔ Убрали race condition
+✔ Убрали костыль в entrypoint
 
 1.4 Healthcheck
-
-/health endpoint
-
-Проверяет:
-
-доступность БД
-
-состояние приложения
-
-Docker HEALTHCHECK
+✔ /health endpoint есть
+✔ Docker healthcheck у MySQL есть
+❌ /health/db — пока нет
+❌ Docker HEALTHCHECK для API — пока нет
+❌ убрать wait-for-db полностью
+❌ добавить /health/db
+❌ перейти к Prisma / TypeORM
 
 1.5 Graceful shutdown
-
 Обработка:
 
 SIGTERM

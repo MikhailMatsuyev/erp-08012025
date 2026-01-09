@@ -2,10 +2,18 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/app.js",
-    "dev": "ts-node-dev --respawn --transpile-only src/app.ts"
+    "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:reset": "echo ⚠️ This will DELETE ALL VOLUMES && docker-compose down -v --remove-orphans",
+    "docker:restart": "docker-compose down && docker-compose up -d",
+    "docker:logs": "docker-compose logs -f",
+    "docker:health": "curl -f http://localhost:3000/health"
   },
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "mysql2": "^3.16.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
