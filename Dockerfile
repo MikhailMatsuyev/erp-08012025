@@ -1,3 +1,15 @@
+# ---------- Stage 0: DEV ----------
+FROM node:20-alpine AS dev
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+CMD ["npm", "run", "dev"]
+
 # ---------- Stage 1: Build ----------
 FROM node:20-alpine AS builder
 

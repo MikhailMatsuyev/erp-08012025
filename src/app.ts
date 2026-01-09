@@ -21,6 +21,29 @@ app.get('/', (_req: Request, res: Response) => {
     res.send('API is running');
 });
 
+
+app.get('/health/db', async (_req: Request, res: Response) => {
+    try {
+        const connection = await pool.getConnection();
+        await connection.ping();
+        connection.release();
+
+        res.status(200).json({
+            status: 'ok',
+            database: 'connected',
+            timestamp: new Date().toISOString(),
+        });
+    } catch (error) {
+        console.error('Database healthcheck failed:', error);
+
+        res.status(503).json({
+            status: 'error',
+            database: 'unavailable',
+            timestamp: new Date().toISOString(),
+        });
+    }
+});
+
 // ГЛОБАЛЬНЫЙ HANDLER — ВСЕГДА ПОСЛЕДНИМ
 app.use(errorHandler);
 
