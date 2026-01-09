@@ -56,9 +56,10 @@ mysql_data ✅
 ✔ /health endpoint есть
 ✔ Docker healthcheck у MySQL есть
 ✔ /health/db есть
-✔ Docker HEALTHCHECK для API — пока нет
-✔ убрать wait-for-db полностью
-❌ перейти к Prisma / TypeORM
+✔ Docker HEALTHCHECK для API есть
+✔ убрать wait-for-db полностью есть
+✔ перейти к Prisma есть
+ глобальный Prisma error handler
 
 1.5 Graceful shutdown
 Обработка:

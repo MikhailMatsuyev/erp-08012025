@@ -1,6 +1,6 @@
 import express, { Express, Request, Response } from 'express';
-import { pool } from './db/mysql';
 import { errorHandler } from "./middlewares/error.middleware";
+import { prisma } from './db/prisma';
 
 const app: Express = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -24,9 +24,7 @@ app.get('/', (_req: Request, res: Response) => {
 
 app.get('/health/db', async (_req: Request, res: Response) => {
     try {
-        const connection = await pool.getConnection();
-        await connection.ping();
-        connection.release();
+        await prisma.$queryRaw`SELECT 1`;
 
         res.status(200).json({
             status: 'ok',
@@ -47,27 +45,11 @@ app.get('/health/db', async (_req: Request, res: Response) => {
 // ГЛОБАЛЬНЫЙ HANDLER — ВСЕГДА ПОСЛЕДНИМ
 app.use(errorHandler);
 
-async function checkDatabaseConnection() {
-    const connection = await pool.getConnection();
-    await connection.ping();
-    connection.release();
-    console.log('MySQL connection established');
-}
-
 let server: any;
 
-(async () => {
-    try {
-        await checkDatabaseConnection();
-
-        server = app.listen(PORT, () => {
-            console.log(`Server listening on port ${PORT}`);
-        });
-    } catch (error) {
-        console.error('Failed to start application:', error);
-        process.exit(1);
-    }
-})();
+server = app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}`);
+});
 
 // Graceful shutdown
 const shutdown = async (signal: string) => {
@@ -80,10 +62,10 @@ const shutdown = async (signal: string) => {
     }
 
     try {
-        await pool.end();
-        console.log('MySQL pool closed');
+        await prisma.$disconnect();
+        console.log('Prisma disconnected');
     } catch (err) {
-        console.error('Error closing MySQL pool', err);
+        console.error('Error disconnecting Prisma', err);
     }
 
     process.exit(0);

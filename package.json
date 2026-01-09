@@ -3,18 +3,20 @@
     "build": "tsc",
     "start": "node dist/app.js",
     "dev": "nodemon --watch src --ext ts --exec ts-node src/app.ts --legacy-watch",
-    "docker:build": "docker compose -f docker-compose.yml up --build",
-    "docker:up": "docker-compose up",
-    "docker:down": "docker-compose down",
+    "docker:prod": "docker compose -f docker-compose.yml up --build",
+    "docker:dev": "docker compose up --build",
+    "docker:down": "docker compose down",
     "docker:reset": "echo ⚠️ This will DELETE ALL VOLUMES && docker-compose down -v --remove-orphans",
     "docker:restart": "docker-compose down && docker-compose up -d",
     "docker:logs": "docker-compose logs -f",
     "docker:health": "curl -f http://localhost:3000/health",
+    "db:health": "curl -f http://localhost:3000/health/db",
     "tree": "powershell -ExecutionPolicy Bypass -File ./scripts/tree.ps1"
   },
   "dependencies": {
+    "@prisma/client": "^6.19.1",
     "express": "^5.2.1",
-    "mysql2": "^3.16.0"
+    "prisma": "^6.19.1"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",

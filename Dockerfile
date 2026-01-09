@@ -6,6 +6,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
+COPY prisma ./prisma
+RUN npx prisma generate
+
 COPY . .
 
 CMD ["npm", "run", "dev"]
@@ -22,6 +25,9 @@ RUN npm ci
 # Копируем исходники и собираем TS
 COPY tsconfig.json ./
 COPY src ./src
+COPY prisma ./prisma
+
+RUN npx prisma generate
 RUN npm run build
 
 
@@ -42,6 +48,8 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 
 # Копируем скомпилированный код
+COPY --from=builder /app/node_modules/.prisma /app/node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma /app/node_modules/@prisma
 COPY --from=builder /app/dist ./dist
 
 # Меняем пользователя
