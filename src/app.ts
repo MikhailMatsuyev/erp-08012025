@@ -1,8 +1,12 @@
-import express, { Request, Response } from 'express';
+import express, { Express, Request, Response } from 'express';
 import { pool } from './db/mysql';
+import { errorHandler } from "./middlewares/error.middleware";
 
-const app = express();
+const app: Express = express();
 const PORT = Number(process.env.PORT) || 3000;
+
+// Middleware
+app.use(express.json());
 
 // Healthcheck
 app.get('/health', (_req: Request, res: Response) => {
@@ -16,6 +20,9 @@ app.get('/health', (_req: Request, res: Response) => {
 app.get('/', (_req: Request, res: Response) => {
     res.send('API is running');
 });
+
+// ГЛОБАЛЬНЫЙ HANDLER — ВСЕГДА ПОСЛЕДНИМ
+app.use(errorHandler);
 
 async function checkDatabaseConnection() {
     const connection = await pool.getConnection();
