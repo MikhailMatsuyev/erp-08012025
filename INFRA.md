@@ -62,20 +62,15 @@ mysql_data ✅
 ✔ глобальный Prisma error handler
 
 1.5 Graceful shutdown
-Обработка:
-
+✔ Обработка: есть
 SIGTERM
-
 SIGINT
 
-Закрытие:
-
+✔ Закрытие: есть
 HTTP server
-
 MySQL pool
 
-Логи:
-
+✔ Логи: есть
 Server shutting down...
 
 🧠 EPIC 2 — Архитектура Express приложения

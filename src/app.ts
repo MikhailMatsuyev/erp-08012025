@@ -5,6 +5,7 @@ import { prismaErrorMiddleware } from "./middlewares/prisma-error.middleware";
 
 const app: Express = express();
 const PORT = Number(process.env.PORT) || 3000;
+let isShuttingDown = false;
 
 // Middleware
 app.use(express.json());
@@ -68,24 +69,32 @@ server = app.listen(PORT, () => {
 });
 
 // Graceful shutdown
-const shutdown = async (signal: string) => {
-    console.log(`Received ${signal}. Shutting down gracefully...`);
-
-    if (server) {
-        server.close(() => {
-            console.log('HTTP server closed');
-        });
+async function shutdown(signal: string) {
+    if (isShuttingDown) {
+        return;
     }
 
-    try {
-        await prisma.$disconnect();
-        console.log('Prisma disconnected');
-    } catch (err) {
-        console.error('Error disconnecting Prisma', err);
-    }
+    isShuttingDown = true;
+    console.log(`Server shutting down... (${signal})`);
 
-    process.exit(0);
-};
+    server.close(async (err?: Error) => {
+        if (err) {
+            console.error('Error closing HTTP server', err);
+            process.exit(1);
+        }
 
+        try {
+            await prisma.$disconnect();
+            console.log('MySQL pool closed');
+        } catch (e) {
+            console.error('Error disconnecting Prisma', e);
+        } finally {
+            process.exit(0);
+        }
+    });
+}
+
+// Подписываемся на сигналы остановки Docker, чтобы
+// корректно остановить приложение, призму, сервер
 process.on('SIGTERM', shutdown);
 process.on('SIGINT', shutdown);
