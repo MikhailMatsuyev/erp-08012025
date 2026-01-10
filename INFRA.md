@@ -77,17 +77,47 @@ Server shutting down...
 2.1 Структура проекта
 src/
 ├── app.ts
-├── server.js
+├── server.ts
+│
 ├── config/
-│    ├── db.js
-│    └── jwt.js
-├── routes/
-├── controllers/
-├── services/
+│   ├── env.ts                 # env validation
+│   ├── db.ts                  # Prisma client
+│   └── jwt.ts                 # secrets, TTL
+│
+├── modules/
+│   ├── auth/
+│   │   ├── auth.routes.ts     # /signin /signup /logout /new_token
+│   │   ├── auth.controller.ts # HTTP слой
+│   │   ├── auth.service.ts    # бизнес-логика auth
+│   │   ├── auth.repository.ts # Prisma (users, sessions)
+│   │   └── auth.types.ts      # DTO
+│   │
+│   ├── files/
+│   │   ├── files.routes.ts    # /file/*
+│   │   ├── files.controller.ts
+│   │   ├── files.service.ts
+│   │   ├── files.repository.ts
+│   │   └── files.types.ts
+│   │
+│   └── users/
+│       └── users.repository.ts # (минимально)
+│
 ├── middlewares/
-├── models/
+│   ├── auth.middleware.ts     # JWT + session check
+│   ├── error.middleware.ts
+│   └── prisma-error.middleware.ts
+│
 ├── utils/
-└── uploads/ (volume)
+│   ├── hash.ts                # bcrypt
+│   ├── token.ts               # jwt sign/verify
+│   └── async-handler.ts
+│
+├── routes/
+│   └── index.ts               # сборка модулей
+│
+├── uploads/                   # volume
+│
+└── __tests__/                 # (опционально)
 
 2.2 CORS
 
