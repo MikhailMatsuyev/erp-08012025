@@ -59,7 +59,7 @@ mysql_data ✅
 ✔ Docker HEALTHCHECK для API есть
 ✔ убрать wait-for-db полностью есть
 ✔ перейти к Prisma есть
- глобальный Prisma error handler
+✔ глобальный Prisma error handler
 
 1.5 Graceful shutdown
 Обработка:

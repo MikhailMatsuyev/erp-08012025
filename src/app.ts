@@ -1,6 +1,7 @@
 import express, { Express, Request, Response } from 'express';
 import { errorHandler } from "./middlewares/error.middleware";
 import { prisma } from './db/prisma';
+import { prismaErrorMiddleware } from "./middlewares/prisma-error.middleware";
 
 const app: Express = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -41,6 +42,21 @@ app.get('/health/db', async (_req: Request, res: Response) => {
         });
     }
 });
+
+app.get('/__test/error', () => {
+    throw new Error('boom - checking Global Error Handler OK');
+});
+
+app.get('/__test/prisma-error', async (_req, _res, next) => {
+    try {
+        await prisma.$queryRawUnsafe('SELECT * FROM table_that_does_not_exist');
+    } catch (e) {
+        next(e);
+    }
+});
+
+// HANDLER ошибок БД
+app.use(prismaErrorMiddleware);
 
 // ГЛОБАЛЬНЫЙ HANDLER — ВСЕГДА ПОСЛЕДНИМ
 app.use(errorHandler);
