@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { jwtConfig } from '../config/jwt';
-import { JwtPayload, isJwtPayload } from '../shared/types/auth';
+import { JwtPayload, isJwtPayload, AccessTokenPayload } from '../shared/types/auth';
 
 export function authMiddleware(
   req: Request,
@@ -17,13 +17,18 @@ export function authMiddleware(
   const token = header.split(' ')[1];
 
   try {
-    const decoded = jwt.verify(token, jwtConfig.access.secret);
+    const decoded: AccessTokenPayload = jwt.verify(
+      token,
+      jwtConfig.access.secret
+    ) as AccessTokenPayload;
 
-    if (!isJwtPayload(decoded)) {
-      return res.status(401).json({ message: 'Invalid token payload' });
-    }
+    // 2️⃣ МАППИНГ (САМОЕ ВАЖНОЕ МЕСТО)
+    req.user = {
+      userId: decoded.sub,
+      sessionId: decoded.sid,
+    };
+    console.log('AUTH MIDDLEWARE req.user =', req.user);
 
-    req.user = decoded;
     next();
   } catch {
     return res.status(401).json({ message: 'Invalid or expired token' });

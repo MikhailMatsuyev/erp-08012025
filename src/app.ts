@@ -2,6 +2,12 @@ import express, { Express, Request, Response } from 'express';
 import { errorHandler } from "./middlewares/error.middleware";
 import { prisma } from './db/prisma';
 import { prismaErrorMiddleware } from "./middlewares/prisma-error.middleware";
+import authRoutes from "./routes/auth.routes";
+// import dotenv from 'dotenv';
+//
+// if (!process.env.DATABASE_URL) {
+//     dotenv.config();
+// }
 
 const app: Express = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -55,6 +61,8 @@ app.get('/__test/prisma-error', async (_req, _res, next) => {
         next(e);
     }
 });
+
+app.use('/auth', authRoutes);
 
 // HANDLER ошибок БД
 app.use(prismaErrorMiddleware);

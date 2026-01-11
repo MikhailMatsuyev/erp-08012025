@@ -1,13 +1,13 @@
-interface AccessTokenPayload  {
+export interface AccessTokenPayload  {
   sub: string;
   sid: string;
 }
 
-export interface AuthPayload {
-  sub: string;       // userId
+export interface RefreshJwtPayload {
+  userId: string;
   sessionId: string;
-  iat: number;
-  exp: number;
+  iat?: number;
+  exp?: number;
 }
 
 export interface JwtPayload {

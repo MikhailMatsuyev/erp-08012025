@@ -11,7 +11,8 @@
     "docker:logs": "docker-compose logs -f",
     "docker:health": "curl -f http://localhost:3000/health",
     "db:health": "curl -f http://localhost:3000/health/db",
-    "tree": "powershell -ExecutionPolicy Bypass -File ./scripts/tree.ps1"
+    "tree": "powershell -ExecutionPolicy Bypass -File ./scripts/tree.ps1",
+    "migrate:docker": "prisma migrate deploy"
   },
   "dependencies": {
     "@prisma/client": "^6.19.1",

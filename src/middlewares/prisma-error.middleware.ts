@@ -20,6 +20,14 @@ export function prismaErrorMiddleware(
         status = 404;
         message = 'Record not found';
         break;
+      case 'P2021':
+        status = 500;
+        message = 'Database schema is not initialized';
+        break;
+      case 'P2003':
+        status = 409;
+        message = 'Invalid relation reference';
+        break;
     }
 
     return res.status(status).json({

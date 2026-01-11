@@ -3,13 +3,13 @@ import { prisma } from '../db/prisma';
 import { hashPassword, comparePassword } from '../utils/password';
 import {
   generateAccessToken,
-  generateRefreshToken,
+  generateRefreshToken, hashRefreshToken,
 } from '../utils/tokens';
 import { jwtConfig } from '../config/jwt';
 
 export class AuthService {
   /**
-   * Регистрация нового пользователя
+   * Регистрация
    */
   static async signup(login: string, password: string) {
     const passwordHash = await hashPassword(password);
@@ -21,12 +21,11 @@ export class AuthService {
       },
     });
 
-    // создаём сессию сразу после регистрации
     return this.createSession(user.id);
   }
 
   /**
-   * Авторизация пользователя
+   * Логин
    */
   static async signin(login: string, password: string) {
     const user = await prisma.user.findUnique({
@@ -37,8 +36,8 @@ export class AuthService {
       throw new Error('Invalid credentials');
     }
 
-    const isValid = await comparePassword(password, user.passwordHash);
-    if (!isValid) {
+    const valid = await comparePassword(password, user.passwordHash);
+    if (!valid) {
       throw new Error('Invalid credentials');
     }
 
@@ -46,7 +45,7 @@ export class AuthService {
   }
 
   /**
-   * Обновление access токена по refresh токену
+   * Обновление access token
    */
   static async refresh(refreshToken: string) {
     const refreshTokenHash = this.hashRefreshToken(refreshToken);
@@ -74,22 +73,29 @@ export class AuthService {
   }
 
   /**
-   * Logout (отзыв сессии)
+   * Logout — отзыв конкретной сессии
    */
-  static async logout(sessionId: string) {
-    await prisma.session.update({
-      where: { id: sessionId },
-      data: { revoked: true },
+  static async logout(refreshToken: string) {
+    const refreshTokenHash = this.hashRefreshToken(refreshToken);
+
+    await prisma.session.updateMany({
+      where: {
+        refreshTokenHash,
+        revoked: false,
+      },
+      data: {
+        revoked: true,
+      },
     });
   }
 
   // =========================
-  // ВНУТРЕННИЕ МЕТОДЫ
+  // INTERNALS
   // =========================
 
   private static async createSession(userId: string) {
     const refreshToken = generateRefreshToken();
-    const refreshTokenHash = this.hashRefreshToken(refreshToken);
+    const refreshTokenHash = hashRefreshToken(refreshToken);
 
     const session = await prisma.session.create({
       data: {
