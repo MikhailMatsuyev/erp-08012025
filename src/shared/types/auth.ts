@@ -9,3 +9,17 @@ export interface AuthPayload {
   iat: number;
   exp: number;
 }
+
+export interface JwtPayload {
+  userId: string;
+  sessionId: string;
+}
+
+export function isJwtPayload(payload: any): payload is JwtPayload {
+  return (
+    payload &&
+    typeof payload === 'object' &&
+    typeof payload.userId === 'string' &&
+    typeof payload.sessionId === 'string'
+  );
+}

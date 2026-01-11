@@ -1,38 +1,31 @@
-import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { AuthPayload } from "../shared/types/auth";
-import { jwtConfig } from "../config/jwt";
-
-
+import { Request, Response, NextFunction } from 'express';
+import { jwtConfig } from '../config/jwt';
+import { JwtPayload, isJwtPayload } from '../shared/types/auth';
 
 export function authMiddleware(
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) {
-  const authHeader = req.headers.authorization;
+  const header = req.headers.authorization;
 
-  if (!authHeader) {
-    return res.status(401).json({ message: 'Authorization header missing' });
+  if (!header || !header.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Unauthorized' });
   }
 
-  const [type, token] = authHeader.split(' ');
-
-  if (type !== 'Bearer' || !token) {
-    return res.status(401).json({ message: 'Invalid authorization format' });
-  }
+  const token = header.split(' ')[1];
 
   try {
-    const payload = jwt.verify(
-      token,
-      jwtConfig.access.secret,
-    ) as AuthPayload;
+    const decoded = jwt.verify(token, jwtConfig.access.secret);
 
-    // 👇 КЛЮЧЕВОЙ МОМЕНТ
-    req.user = payload;
+    if (!isJwtPayload(decoded)) {
+      return res.status(401).json({ message: 'Invalid token payload' });
+    }
 
+    req.user = decoded;
     next();
-  } catch (err) {
+  } catch {
     return res.status(401).json({ message: 'Invalid or expired token' });
   }
 }
