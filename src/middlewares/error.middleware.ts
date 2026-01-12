@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { HttpError } from "../utils/error";
 
 export function errorHandler(
   err: any,
@@ -6,6 +7,15 @@ export function errorHandler(
   res: Response,
   next: NextFunction,
 ) {
+  if (err instanceof HttpError) {
+    return res.status(err.status).json({
+      status: 'error',
+      message: err.message,
+      path: req.path,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
   const status = err.status || err.statusCode || 500;
 
   const response = {

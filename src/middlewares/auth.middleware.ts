@@ -2,8 +2,9 @@ import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { jwtConfig } from '../config/jwt';
 import { JwtPayload, isJwtPayload, AccessTokenPayload } from '../shared/types/auth';
+import { prisma } from "../db/prisma";
 
-export function authMiddleware(
+export async function authMiddleware(
   req: Request,
   res: Response,
   next: NextFunction
@@ -21,6 +22,18 @@ export function authMiddleware(
       token,
       jwtConfig.access.secret
     ) as AccessTokenPayload;
+
+    const session = await prisma.session.findUnique({
+      where: { id: decoded.sid },
+    });
+
+    if (
+      !session ||
+      session.revoked ||
+      session.expiresAt <= new Date()
+    ) {
+      return res.status(401).json({ message: 'Session revoked' });
+    }
 
     req.user = {
       sub: decoded.sub,
