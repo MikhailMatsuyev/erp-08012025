@@ -22,12 +22,10 @@ export function authMiddleware(
       jwtConfig.access.secret
     ) as AccessTokenPayload;
 
-    // 2️⃣ МАППИНГ (САМОЕ ВАЖНОЕ МЕСТО)
     req.user = {
-      userId: decoded.sub,
-      sessionId: decoded.sid,
+      sub: decoded.sub,
+      sid: decoded.sid,
     };
-    console.log('AUTH MIDDLEWARE req.user =', req.user);
 
     next();
   } catch {

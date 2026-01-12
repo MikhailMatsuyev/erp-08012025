@@ -2,16 +2,20 @@ import { Request, Response } from 'express';
 import { AuthService } from '../services/auth.service';
 
 export class AuthController {
-  static info(req: Request, res: Response) {
+  static async info(req: Request, res: Response) {
     res.json({
-      id: req.user!.userId,
+      id: req.user!.sub,
     });
   }
 
   static async signup(req: Request, res: Response) {
-    const { login, password } = req.body;
+    const { id, password } = req.body;
 
-    const tokens = await AuthService.signup(login, password);
+    if (!id || !password) {
+      return res.status(400).json({ message: 'id and password required' });
+    }
+
+    const tokens = await AuthService.signup(id, password);
 
     res.status(201).json(tokens);
   }
@@ -33,15 +37,11 @@ export class AuthController {
   }
 
   static async logout(req: Request, res: Response) {
-    /**
-     * logout ДОЛЖЕН работать по access token
-     * => sessionId берём из req.user
-     */
     const sessionId = req.user!.sid;
 
     await AuthService.logout(sessionId);
 
-    res.status(204).send();
+    return res.status(200).json({ message: 'Logged out' });
   }
 }
 

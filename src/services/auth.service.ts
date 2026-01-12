@@ -54,38 +54,45 @@ export class AuthService {
       where: {
         refreshTokenHash,
         revoked: false,
-        expiresAt: {
-          gt: new Date(),
-        },
+        expiresAt: { gt: new Date() },
       },
     });
 
     if (!session) {
-      throw new Error('Invalid refresh token');
+      const err: any = new Error('Invalid refresh token');
+      err.status = 401;
+      throw err
     }
+
+    // 🔥 ROTATION
+    const newRefreshToken = crypto.randomBytes(64).toString('hex');
+    const newRefreshTokenHash = this.hashRefreshToken(newRefreshToken);
+
+    await prisma.session.update({
+      where: { id: session.id },
+      data: {
+        refreshTokenHash: newRefreshTokenHash,
+      },
+    });
 
     const accessToken = generateAccessToken({
       sub: session.userId,
       sid: session.id,
     });
 
-    return { accessToken };
+    return {
+      accessToken,
+      refreshToken: newRefreshToken,
+    };
   }
 
   /**
    * Logout — отзыв конкретной сессии
    */
-  static async logout(refreshToken: string) {
-    const refreshTokenHash = this.hashRefreshToken(refreshToken);
-
-    await prisma.session.updateMany({
-      where: {
-        refreshTokenHash,
-        revoked: false,
-      },
-      data: {
-        revoked: true,
-      },
+  static async logout(sessionId: string) {
+    await prisma.session.update({
+      where: { id: sessionId },
+      data: { revoked: true },
     });
   }
 

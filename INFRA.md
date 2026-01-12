@@ -130,8 +130,6 @@ credentials: true
 Проверить:
 Access token — 10 минут
 
-Refresh token — в БД
-
 Multi-device
 
 Logout → revoke один refresh
