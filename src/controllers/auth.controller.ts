@@ -9,10 +9,10 @@ export class AuthController {
   }
 
   static async signup(req: Request, res: Response) {
-    const { id, password } = req.body;
+    const {id, password} = req.body;
 
     if (!id || !password) {
-      return res.status(400).json({ message: 'id and password required' });
+      return res.status(400).json({message: 'id and password required'});
     }
 
     const tokens = await AuthService.signup(id, password);
@@ -21,15 +21,15 @@ export class AuthController {
   }
 
   static async signin(req: Request, res: Response) {
-    const { login, password } = req.body;
+    const {id, password} = req.body;
 
-    const tokens = await AuthService.signin(login, password);
+    const tokens = await AuthService.signin(id, password);
 
     res.json(tokens);
   }
 
   static async refresh(req: Request, res: Response) {
-    const { refreshToken } = req.body;
+    const {refreshToken} = req.body;
 
     const result = await AuthService.refresh(refreshToken);
 
@@ -41,7 +41,7 @@ export class AuthController {
 
     await AuthService.logout(sessionId);
 
-    return res.status(200).json({ message: 'Logged out' });
+    return res.status(200).json({message: 'Logged out'});
   }
 }
 

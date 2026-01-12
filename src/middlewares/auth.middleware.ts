@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { jwtConfig } from '../config/jwt';
-import { JwtPayload, isJwtPayload, AccessTokenPayload } from '../shared/types/auth';
+import { AccessTokenPayload } from '../shared/types/auth';
 import { prisma } from "../db/prisma";
 
 export async function authMiddleware(
@@ -12,7 +12,7 @@ export async function authMiddleware(
   const header = req.headers.authorization;
 
   if (!header || !header.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Unauthorized' });
+    return res.status(401).json({message: 'Unauthorized'});
   }
 
   const token = header.split(' ')[1];
@@ -24,7 +24,7 @@ export async function authMiddleware(
     ) as AccessTokenPayload;
 
     const session = await prisma.session.findUnique({
-      where: { id: decoded.sid },
+      where: {id: decoded.sid},
     });
 
     if (
@@ -32,7 +32,7 @@ export async function authMiddleware(
       session.revoked ||
       session.expiresAt <= new Date()
     ) {
-      return res.status(401).json({ message: 'Session revoked' });
+      return res.status(401).json({message: 'Session revoked'});
     }
 
     req.user = {
@@ -42,6 +42,6 @@ export async function authMiddleware(
 
     next();
   } catch {
-    return res.status(401).json({ message: 'Invalid or expired token' });
+    return res.status(401).json({message: 'Invalid or expired token'});
   }
 }

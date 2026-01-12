@@ -5,7 +5,7 @@ import { BadRequestError } from "../utils/error";
 export class FileController {
   static async upload(req: Request, res: Response) {
     if (!req.file) {
-      return res.status(400).json({ message: 'File is required' });
+      return res.status(400).json({message: 'File is required'});
     }
     const userId = req.user!.sub;
     const file = await FileService.upload(userId, req.file);
@@ -21,7 +21,7 @@ export class FileController {
     const fileId = req.params.id;
     const userId = req.user!.sub;
 
-    const { file, absolutePath } =
+    const {file, absolutePath} =
       await FileService.getFileForDownload(fileId, userId);
 
     res.download(

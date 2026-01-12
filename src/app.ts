@@ -4,6 +4,7 @@ import { prisma } from './db/prisma';
 import { prismaErrorMiddleware } from "./middlewares/prisma-error.middleware";
 import authRoutes from "./routes/auth.routes";
 import fileRoutes from "./routes/file.routes";
+import { corsMiddleware } from "./middlewares/cors.middleware";
 
 const app: Express = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -58,8 +59,11 @@ app.get('/__test/prisma-error', async (_req, _res, next) => {
     next(e);
   }
 });
-app.use('/file', fileRoutes);
 
+
+app.use(corsMiddleware);
+
+app.use('/file', fileRoutes);
 app.use('/auth', authRoutes);
 
 app.use((req, res) => {

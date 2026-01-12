@@ -6,6 +6,7 @@ import {
   generateRefreshToken, hashRefreshToken,
 } from '../utils/tokens';
 import { jwtConfig } from '../config/jwt';
+import { UnauthorizedError } from "../utils/error";
 
 export class AuthService {
   /**
@@ -29,16 +30,16 @@ export class AuthService {
    */
   static async signin(login: string, password: string) {
     const user = await prisma.user.findUnique({
-      where: { login },
+      where: {login},
     });
 
     if (!user) {
-      throw new Error('Invalid credentials');
+      throw new UnauthorizedError('Invalid credentials');
     }
 
     const valid = await comparePassword(password, user.passwordHash);
     if (!valid) {
-      throw new Error('Invalid credentials');
+      throw new UnauthorizedError('Invalid credentials');
     }
 
     return this.createSession(user.id);
@@ -54,14 +55,12 @@ export class AuthService {
       where: {
         refreshTokenHash,
         revoked: false,
-        expiresAt: { gt: new Date() },
+        expiresAt: {gt: new Date()},
       },
     });
 
     if (!session) {
-      const err: any = new Error('Invalid refresh token');
-      err.status = 401;
-      throw err
+      throw new UnauthorizedError('Invalid refresh token');
     }
 
     // 🔥 ROTATION
@@ -69,7 +68,7 @@ export class AuthService {
     const newRefreshTokenHash = this.hashRefreshToken(newRefreshToken);
 
     await prisma.session.update({
-      where: { id: session.id },
+      where: {id: session.id},
       data: {
         refreshTokenHash: newRefreshTokenHash,
       },
@@ -91,8 +90,8 @@ export class AuthService {
    */
   static async logout(sessionId: string) {
     await prisma.session.update({
-      where: { id: sessionId },
-      data: { revoked: true },
+      where: {id: sessionId},
+      data: {revoked: true},
     });
   }
 

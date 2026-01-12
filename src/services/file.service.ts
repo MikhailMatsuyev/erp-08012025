@@ -22,9 +22,10 @@ export class FileService {
 
     return record;
   }
+
   static async getFileForDownload(fileId: string, userId: string) {
     const file = await prisma.file.findUnique({
-      where: { id: fileId },
+      where: {id: fileId},
     });
 
     if (!file) {
@@ -46,6 +47,7 @@ export class FileService {
       absolutePath,
     };
   }
+
   static async list(
     userId: string,
     page: number,
@@ -55,8 +57,8 @@ export class FileService {
 
     const [items, total] = await Promise.all([
       prisma.file.findMany({
-        where: { userId },
-        orderBy: { createdAt: 'desc' },
+        where: {userId},
+        orderBy: {createdAt: 'desc'},
         skip,
         take: listSize,
         select: {
@@ -69,7 +71,7 @@ export class FileService {
         },
       }),
       prisma.file.count({
-        where: { userId },
+        where: {userId},
       }),
     ]);
 
@@ -83,6 +85,7 @@ export class FileService {
       },
     };
   }
+
   static async getById(userId: string, fileId: string) {
     const file = await prisma.file.findFirst({
       where: {
@@ -106,9 +109,10 @@ export class FileService {
 
     return file;
   }
+
   static async delete(fileId: string, userId: string) {
     const file = await prisma.file.findUnique({
-      where: { id: fileId },
+      where: {id: fileId},
     });
 
     if (!file) {
@@ -134,9 +138,10 @@ export class FileService {
 
     // удаляем запись из БД
     await prisma.file.delete({
-      where: { id: fileId },
+      where: {id: fileId},
     });
   }
+
   static async update(
     fileId: string,
     userId: string,
@@ -159,7 +164,7 @@ export class FileService {
     try {
       // обновляем БД
       const updated = await prisma.file.update({
-        where: { id: fileId },
+        where: {id: fileId},
         data: {
           originalName: newFile.originalname,
           extension: path.extname(newFile.originalname).slice(1),

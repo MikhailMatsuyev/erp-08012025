@@ -7,7 +7,7 @@ const uploadDir = path.resolve(process.cwd(), 'uploads');
 
 // гарантируем, что папка существует
 if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+  fs.mkdirSync(uploadDir, {recursive: true});
 }
 
 export const upload = multer({
